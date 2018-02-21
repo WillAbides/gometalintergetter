@@ -7,9 +7,8 @@ script/build
 
 GOBIN="$GOPATH/bin"
 mkdir -p "$GOBIN"
-PATH="$GOBIN:$PATH"
 bin/gometalintergetter -i "$GOBIN"
 
 test $# -gt 0 || set -- ./...
 echo Linting "$@"
-exec gometalinter --vendor $@
+exec "$GOBIN/gometalinter" $@

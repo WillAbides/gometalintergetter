@@ -1,5 +1,12 @@
 {
-  "Disable": ["vetshadow", "gocyclo", "maligned"],
+  "Disable": [
+    "vetshadow",
+    "gocyclo",
+    "maligned"
+  ],
   "Deadline": "120s",
-  "Vendor": true
+  "Vendor": true,
+  "Skip": [
+    "mocks"
+  ]
 }

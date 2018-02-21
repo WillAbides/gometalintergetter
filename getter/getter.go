@@ -26,15 +26,17 @@ type (
 		skipSymlink bool
 	}
 
+	// Option is an configuration option for DownloadMetalinter
 	Option func(*downloader)
 
+	// RepositorySvc is the portion of github.Repositories that we use
 	RepositorySvc interface {
 		GetLatestRelease(ctx context.Context, owner, repo string) (*github.RepositoryRelease, *github.Response, error)
 		GetReleaseByTag(ctx context.Context, owner, repo, tag string) (*github.RepositoryRelease, *github.Response, error)
 	}
 )
 
-// WithArch specifies the OS to download.  Default is the same as the current runtime
+// WithOS specifies the OS to download.  Default is the same as the current runtime
 func WithOS(os string) Option {
 	return func(d *downloader) {
 		d.os = os
@@ -90,7 +92,7 @@ func (d *downloader) getReleaseAsset(version string) (*github.ReleaseAsset, erro
 	assets := release.Assets
 	for _, asset := range assets {
 		assetOS, assetArch, ok := internal.GetAssetMetadata(asset.GetName())
-		if ok == false || assetArch != d.arch || assetOS != d.os {
+		if !ok || assetArch != d.arch || assetOS != d.os {
 			continue
 		}
 		return &asset, nil
@@ -98,7 +100,9 @@ func (d *downloader) getReleaseAsset(version string) (*github.ReleaseAsset, erro
 	return nil, errors.Errorf("could not find release asset")
 }
 
+// DownloadMetalinter download gometalinter to the specified path and make a symlink
 func DownloadMetalinter(version, dstPath string, opts ...Option) error {
+	var err error
 	d := &downloader{
 		arch:       runtime.GOARCH,
 		os:         runtime.GOOS,
@@ -118,8 +122,8 @@ func DownloadMetalinter(version, dstPath string, opts ...Option) error {
 	binFile := filepath.Join(internal.AssetDirectory(dstPath, asset.GetName()), "gometalinter")
 
 	if !d.force {
-		oldUrl, err := ioutil.ReadFile(archiveURLFile)
-		if err == nil && string(oldUrl) == asset.GetBrowserDownloadURL() {
+		oldURL, err := ioutil.ReadFile(archiveURLFile)
+		if err == nil && string(oldURL) == asset.GetBrowserDownloadURL() {
 			return nil
 		}
 	}
@@ -128,7 +132,8 @@ func DownloadMetalinter(version, dstPath string, opts ...Option) error {
 	if err != nil {
 		return errors.Wrapf(err, "failed downloading file: %s", asset.GetBrowserDownloadURL())
 	}
-	defer resp.Body.Close()
+
+	defer internal.SafeClose(resp.Body, &err)
 
 	archy := archiver.MatchingFormat(asset.GetName())
 
@@ -147,8 +152,11 @@ func DownloadMetalinter(version, dstPath string, opts ...Option) error {
 	}
 
 	if !d.skipSymlink {
-		os.Symlink(binFile, filepath.Join(dstPath, "gometalinter"))
+		err := os.Symlink(binFile, filepath.Join(dstPath, "gometalinter"))
+		if err != nil {
+			return errors.Wrap(err, "failed creating symlink")
+		}
 	}
 
-	return nil
+	return err
 }
