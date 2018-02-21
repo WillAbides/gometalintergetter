@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"io/ioutil"
 	"github.com/WillAbides/gometalintergetter/getter/internal"
+	"os"
 )
 
 var defaultRepo = repository{"alecthomas", "gometalinter"}
@@ -18,10 +19,11 @@ type (
 	repository struct{ owner, name string }
 
 	downloader struct {
-		arch, os   string
-		repoSvc    RepositorySvc
-		repository *repository
-		force      bool
+		arch, os    string
+		repoSvc     RepositorySvc
+		repository  *repository
+		force       bool
+		skipSymlink bool
 	}
 
 	Option func(*downloader)
@@ -57,6 +59,13 @@ func WithRepositoryService(repoSvc RepositorySvc) Option {
 func WithForce() Option {
 	return func(d *downloader) {
 		d.force = true
+	}
+}
+
+// SkipSymlink causes getter to not create a symlink for gometalinter
+func SkipSymlink() Option {
+	return func(d *downloader) {
+		d.skipSymlink = true
 	}
 }
 
@@ -106,6 +115,7 @@ func DownloadMetalinter(version, dstPath string, opts ...Option) error {
 	}
 
 	archiveURLFile := filepath.Join(internal.AssetDirectory(dstPath, asset.GetName()), ".archiveurl")
+	binFile := filepath.Join(internal.AssetDirectory(dstPath, asset.GetName()), "gometalinter")
 
 	if ! d.force {
 		oldUrl, err := ioutil.ReadFile(archiveURLFile)
@@ -135,5 +145,10 @@ func DownloadMetalinter(version, dstPath string, opts ...Option) error {
 	if err != nil {
 		return errors.Wrapf(err, "failed writing %v", archiveURLFile)
 	}
+
+	if ! d.skipSymlink {
+		os.Symlink(binFile, filepath.Join(dstPath, "gometalinter"))
+	}
+
 	return nil
 }

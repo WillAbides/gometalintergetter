@@ -12,7 +12,7 @@ import (
 
 var (
 	version, installDir, targetOS, targetArch string
-	force                                     bool
+	force, skipSymlink                        bool
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -58,6 +58,7 @@ func init() {
 	rootCmd.Flags().StringVarP(&targetOS, "os", "o", runtime.GOOS, "target operating system for gometalinter")
 	rootCmd.Flags().StringVarP(&targetArch, "arch", "a", runtime.GOARCH, "target system architecture for gometalinter")
 	rootCmd.Flags().BoolVarP(&force, "force", "f", false, "force download even if we already have the specified version")
+	rootCmd.Flags().BoolVarP(&force, "skip-symlink", "s", false, "skip creating a symlink to gometalinter bin")
 }
 
 // initConfig reads in config file and ENV variables if set.
