@@ -8,20 +8,9 @@ script/build
 
 GOBIN="$GOPATH/bin"
 mkdir -p "$GOBIN"
-
+PATH="$GOBIN:$PATH"
 bin/gometalintergetter -i "$GOBIN"
 
-
-#GOMETALINTERVERSION=${GOMETALINTERVERSION:-"v2"}
-#GOMETALINTERBIN="gometalinter.$GOMETALINTERVERSION"
-#
-#if ! which "$GOMETALINTERBIN" >/dev/null; then
-#  echo Installing "$GOMETALINTERBIN"...
-#  go get "gopkg.in/alecthomas/gometalinter.$GOMETALINTERVERSION"
-#fi
-#
-#"$GOMETALINTERBIN" --install >/dev/null
-#
-#test $# -gt 0 || set -- ./...
-#echo Linting "$@"
-#exec "$GOMETALINTERBIN" $@
+test $# -gt 0 || set -- ./...
+echo Linting "$@"
+exec gometalinter --vendor $@
