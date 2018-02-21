@@ -4,18 +4,43 @@ import (
 	"fmt"
 	"os"
 
-	homedir "github.com/mitchellh/go-homedir"
+	"github.com/WillAbides/gometalintergetter/getter"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"runtime"
 )
 
-var cfgFile string
+var (
+	version, installDir, targetOS, targetArch string
+	force                                     bool
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "gometalintergetter",
-	Short: "installs gometalinter locally",
-	Long: `installs gometalinter locally`,
+	Use:   "gometalintergetter [version=latest]",
+	Short: "install gometalinter",
+	Args:  cobra.MaximumNArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Printf("Inside rootCmd Run with args: %v\n", args)
+
+		if len(args) == 1 {
+			version = args[0]
+		}
+
+		fmt.Printf("version: %v\n", version)
+		fmt.Printf("installPath: %v\n", installDir)
+		opts := []getter.Option{
+			getter.WithOS(targetOS),
+			getter.WithArch(targetArch),
+		}
+		if force {
+			opts = append(opts, getter.WithForce())
+		}
+		err := getter.DownloadMetalinter(version, installDir, opts...)
+		if err != nil {
+			panic(err)
+		}
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -29,39 +54,13 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.gometalintergetter.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().StringVarP(&installDir, "installdir", "i", ".", "directory where gometalinter will be installed")
+	rootCmd.Flags().StringVarP(&targetOS, "os", "o", runtime.GOOS, "target operating system for gometalinter")
+	rootCmd.Flags().StringVarP(&targetArch, "arch", "a", runtime.GOARCH, "target system architecture for gometalinter")
+	rootCmd.Flags().BoolVarP(&force, "force", "f", false, "force download even if we already have the specified version")
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		// Search config in home directory with name ".gometalintergetter" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".gometalintergetter")
-	}
-
 	viper.AutomaticEnv() // read in environment variables that match
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	}
 }
