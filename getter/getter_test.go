@@ -1,11 +1,11 @@
-package gometalintergetter_test
+package getter_test
 
 import (
 	"path/filepath"
 	"testing"
 	"net/http"
-	. "github.com/WillAbides/gometalintergetter/gometalintergetter"
-	"github.com/WillAbides/gometalintergetter/gometalintergetter/mocks"
+	. "github.com/WillAbides/gometalintergetter/getter"
+	"github.com/WillAbides/gometalintergetter/getter/mocks"
 	"github.com/stretchr/testify/mock"
 	"github.com/google/go-github/github"
 	"net/http/httptest"

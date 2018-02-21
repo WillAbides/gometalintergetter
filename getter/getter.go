@@ -1,4 +1,4 @@
-package gometalintergetter
+package getter
 
 import (
 	"strings"
