@@ -1,0 +1,5 @@
+{
+  "Disable": ["vetshadow", "gocyclo", "maligned"],
+  "Deadline": "120s",
+  "Vendor": true
+}

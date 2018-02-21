@@ -36,6 +36,9 @@ var rootCmd = &cobra.Command{
 		if force {
 			opts = append(opts, getter.WithForce())
 		}
+		if skipSymlink {
+			opts = append(opts, getter.SkipSymlink())
+		}
 		err := getter.DownloadMetalinter(version, installDir, opts...)
 		if err != nil {
 			panic(err)
