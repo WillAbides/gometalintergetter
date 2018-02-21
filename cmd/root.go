@@ -21,14 +21,10 @@ var rootCmd = &cobra.Command{
 	Short: "install gometalinter",
 	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("Inside rootCmd Run with args: %v\n", args)
-
 		if len(args) == 1 {
 			version = args[0]
 		}
 
-		fmt.Printf("version: %v\n", version)
-		fmt.Printf("installPath: %v\n", installDir)
 		opts := []getter.Option{
 			getter.WithOS(targetOS),
 			getter.WithArch(targetArch),
@@ -41,7 +37,8 @@ var rootCmd = &cobra.Command{
 		}
 		err := getter.DownloadMetalinter(version, installDir, opts...)
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 	},
 }
