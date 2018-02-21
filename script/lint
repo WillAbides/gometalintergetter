@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -e
+ROOTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+. "$ROOTPATH/script/build-common"
+cd "$ROOTPATH"
+script/build
+
+GOBIN="$GOPATH/bin"
+mkdir -p "$GOBIN"
+
+bin/gometalintergetter -i "$GOBIN"
+
+
+#GOMETALINTERVERSION=${GOMETALINTERVERSION:-"v2"}
+#GOMETALINTERBIN="gometalinter.$GOMETALINTERVERSION"
+#
+#if ! which "$GOMETALINTERBIN" >/dev/null; then
+#  echo Installing "$GOMETALINTERBIN"...
+#  go get "gopkg.in/alecthomas/gometalinter.$GOMETALINTERVERSION"
+#fi
+#
+#"$GOMETALINTERBIN" --install >/dev/null
+#
+#test $# -gt 0 || set -- ./...
+#echo Linting "$@"
+#exec "$GOMETALINTERBIN" $@

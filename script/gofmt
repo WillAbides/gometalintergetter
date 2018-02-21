@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -e
+
+export ROOTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+. "$ROOTPATH/script/build-common"
+cd "$BASE"
+
+if [ $# -gt 0 ]; then
+    set -- "$PACKAGE/$@"
+else
+    set -- ./...
+fi
+
+echo Run go fmt $@
+go fmt $@
+
+echo Run go fix $@
+go fix  $@
+
+echo Run go vet $@
+go vet  $@

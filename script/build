@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -e
+ROOTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+. "$ROOTPATH/script/build-common"
+
+cd "$BASE"
+go build -o "$BIN/gometalintergetter"

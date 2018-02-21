@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -e
+
+mkdir -p tmp
+
+if [[ "$(uname -s)" = "Darwin" ]]; then
+  brew update
+  brew bundle &> tmp/brew-bundle.log || (
+    echo "Failed to brew bundle:"
+    cat tmp/brew-bundle.log
+  )
+
+  args="-u root"
+fi
+
+if [[ ! -x "$(which go)" ]]; then
+  echo >&2 "gometalintergetter requires an intallation of Go to build."
+  exit 1
+fi
+
+set -x
+go version
+rm -rf .gopath
+mkdir -p .gopath/src/github.com/WillAbides
+ln -s `pwd` .gopath/src/github.com/WillAbides/gometalintergetter
+set +x
