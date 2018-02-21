@@ -1,14 +1,14 @@
 package internal
 
 import (
-	"regexp"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
 func GetAssetMetadata(name string) (os, arch string, ok bool) {
 	assetMatcher := regexp.MustCompile(`([^-]+)-v?(.+)-([^-]+)-([^-]+)(\.tar\.gz|\.tar\.bz2|\.zip)`)
-	if ! assetMatcher.MatchString(name) {
+	if !assetMatcher.MatchString(name) {
 		return
 	}
 	m := assetMatcher.FindStringSubmatch(name)

@@ -1,17 +1,17 @@
 package getter_test
 
 import (
-	"path/filepath"
-	"testing"
-	"net/http"
 	. "github.com/WillAbides/gometalintergetter/getter"
 	"github.com/WillAbides/gometalintergetter/getter/mocks"
-	"github.com/stretchr/testify/mock"
 	"github.com/google/go-github/github"
-	"net/http/httptest"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"os"
+	"path/filepath"
+	"testing"
 )
 
 type (
@@ -68,8 +68,7 @@ func TestDownloadMetalinter(t *testing.T) {
 		WithArch("amd64"),
 	)
 	assert.Nil(t, err)
-	ar, err := ioutil.ReadFile(filepath.Join(td.workDir, "gometalinter-v2.0.2-linux-amd64",  ".archiveurl"))
+	ar, err := ioutil.ReadFile(filepath.Join(td.workDir, "gometalinter-v2.0.2-linux-amd64", ".archiveurl"))
 	assert.Nil(t, err)
 	assert.Equal(t, ts.URL, string(ar))
 }
-

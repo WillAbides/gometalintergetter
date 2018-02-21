@@ -2,15 +2,15 @@ package getter
 
 import (
 	"context"
-	"github.com/google/go-github/github"
-	"github.com/pkg/errors"
-	"runtime"
-	"net/http"
-	"github.com/mholt/archiver"
-	"path/filepath"
-	"io/ioutil"
 	"github.com/WillAbides/gometalintergetter/getter/internal"
+	"github.com/google/go-github/github"
+	"github.com/mholt/archiver"
+	"github.com/pkg/errors"
+	"io/ioutil"
+	"net/http"
 	"os"
+	"path/filepath"
+	"runtime"
 )
 
 var defaultRepo = repository{"alecthomas", "gometalinter"}
@@ -117,7 +117,7 @@ func DownloadMetalinter(version, dstPath string, opts ...Option) error {
 	archiveURLFile := filepath.Join(internal.AssetDirectory(dstPath, asset.GetName()), ".archiveurl")
 	binFile := filepath.Join(internal.AssetDirectory(dstPath, asset.GetName()), "gometalinter")
 
-	if ! d.force {
+	if !d.force {
 		oldUrl, err := ioutil.ReadFile(archiveURLFile)
 		if err == nil && string(oldUrl) == asset.GetBrowserDownloadURL() {
 			return nil
@@ -146,7 +146,7 @@ func DownloadMetalinter(version, dstPath string, opts ...Option) error {
 		return errors.Wrapf(err, "failed writing %v", archiveURLFile)
 	}
 
-	if ! d.skipSymlink {
+	if !d.skipSymlink {
 		os.Symlink(binFile, filepath.Join(dstPath, "gometalinter"))
 	}
 
